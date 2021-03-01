@@ -1,0 +1,56 @@
+version: "3"
+
+services:
+    user_ms:
+        build: ./user_ms
+        image: users:latest
+        restart: always
+        expose:
+            - "80"
+        depends_on:
+            - mongo_user
+        links:
+            - mongo_user
+
+    ride_ms:
+        build: ./ride_ms
+        image: rides:latest
+        restart: always
+        expose:
+            - "80"
+        depends_on:
+            - mongo_ride
+        links:
+            - mongo_ride
+
+    mongo_user:
+        image: mongo:3.0.2
+        expose:
+            - "27017"
+        volumes:
+            - "./data1:/data/db"
+        command:
+            - "--smallfiles"
+
+    mongo_ride:
+        image: mongo:3.0.2
+        expose:
+            - "27017"
+        volumes:
+            - "./data:/data/db"
+        command:
+            - "--smallfiles"
+
+    nginx_user:
+        build: ./userserver
+        container_name: nginx_user
+        restart: always
+        ports:
+            - "8080:80"
+
+    nginx_ride:
+        build: ./rideserver
+        container_name: nginx_ride
+        restart: always
+        ports:
+            - "8000:80"
